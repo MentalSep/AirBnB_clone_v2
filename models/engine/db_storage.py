@@ -30,18 +30,17 @@ class DBStorage:
 
     def all(self, cls=None):
         """ All method """
-        new_dict = {}
         if cls is None:
-            classes = [State, City, User, Place, Review, Amenity]
-            for c in classes:
-                for obj in self.__session.query(c):
-                    key = obj.__class__.__name__ + '.' + obj.id
-                    new_dict[key] = obj
+            objs = self.__session.query(State).all()
+            objs.extend(self.__session.query(City).all())
+            objs.extend(self.__session.query(User).all())
+            objs.extend(self.__session.query(Place).all())
+            objs.extend(self.__session.query(Review).all())
+            objs.extend(self.__session.query(Amenity).all())
         else:
-            for obj in self.__session.query(cls):
-                key = obj.__class__.__name__ + '.' + obj.id
-                new_dict[key] = obj
-        return new_dict
+            objs = self.__session.query(cls).all()
+        return {"{}.{}".format(type(obj).__name__, obj.id): obj
+                for obj in objs}
 
     def new(self, obj):
         """ New method """
