@@ -12,25 +12,26 @@ Base = declarative_base()
 class BaseModel:
     """A base class for all hbnb models"""
 
-    id = Column(String(60), primary_key=True, nullable=False)
+    id = Column(String(60), unique=True, nullable=False, primary_key=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
 
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
         if kwargs:
-            for key, val in kwargs.items():
+            for key, value in kwargs.items():
                 if key == 'created_at' or key == 'updated_at':
                     setattr(self, key,
-                            datetime.strptime(val, '%Y-%m-%dT%H:%M:%S.%f'))
+                            datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f'))
                 elif key != '__class__':
-                    setattr(self, key, val)
+                    setattr(self, key, value)
             if 'id' not in kwargs.keys():
-                self.id = str(uuid.uuid4())
+                setattr(self, 'id', str(uuid.uuid4()))
+            time = datetime.now()
             if 'created_at' not in kwargs.keys():
-                self.created_at = datetime.now()
+                setattr(self, 'created_at', time)
             if 'updated_at' not in kwargs.keys():
-                self.updated_at = datetime.now()
+                setattr(self, 'updated_at', time)
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
@@ -38,8 +39,8 @@ class BaseModel:
 
     def __str__(self):
         """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(
+            type(self).__name__, self.id, self.__dict__)
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
