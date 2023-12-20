@@ -19,3 +19,18 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, default=0, nullable=False)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        reviews = relationship("Review", backref="place",
+                               cascade="all, delete")
+    else:
+        @property
+        def reviews(self):
+            """ Getter for reviews """
+            from models import storage
+            from models.review import Review
+            rList = []
+            for review in storage.all(Review).values():
+                if review.place_id == self.id:
+                    rList.append(review)
+            return rList
