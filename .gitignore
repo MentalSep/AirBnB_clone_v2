@@ -3,3 +3,4 @@ __pycache__
 .coverage
 file.json
 test.py
+htmlcov
